@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SD-DBN Layout</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="demo-shell">
+      <header class="demo-top-bar">
+        <div>
+          <h1>SD-DBN Canvas Component</h1>
+          <p>Demo host for the reusable graph canvas element.</p>
+        </div>
+        <div class="demo-toolbar" aria-label="Canvas controls">
+          <button id="fitButton" type="button" title="Fit graph to viewport">Fit</button>
+          <button id="resetButton" type="button" title="Reset pan and zoom">Reset</button>
+        </div>
+      </header>
+      <section class="demo-stage" aria-label="Graph canvas demo">
+        <sd-dbn-canvas id="salesDbnCanvas"></sd-dbn-canvas>
+      </section>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

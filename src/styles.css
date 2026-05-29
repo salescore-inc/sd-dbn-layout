@@ -1,0 +1,441 @@
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --ink: #222724;
+  --muted: #68716c;
+  --paper: #f7f5ef;
+  --surface: #fffefa;
+  --line: #d6d0c4;
+  --group-line: #928c7e;
+  --node-line: #58635e;
+  --edge: #646e68;
+  --accent: #2f6f73;
+  --accent-weak: #d8e9e7;
+  --focus: #2f6f73;
+  --highlight: #a15f2a;
+  --danger: #a95348;
+  --node: #ffffff;
+  --group: rgba(238, 235, 226, 0.72);
+  --shadow: 0 18px 40px rgba(44, 40, 31, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ink: #e8e3d8;
+    --muted: #aaa59a;
+    --paper: #12130f;
+    --surface: #1a1b16;
+    --line: #3f4036;
+    --group-line: #767264;
+    --node-line: #9b9585;
+    --edge: #aaa394;
+    --accent: #c7a15c;
+    --accent-weak: #3a2e19;
+    --focus: #c7a15c;
+    --highlight: #75a7bd;
+    --danger: #d67961;
+    --node: #171813;
+    --group: rgba(34, 34, 28, 0.72);
+    --shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e8e3d8;
+  --muted: #aaa59a;
+  --paper: #12130f;
+  --surface: #1a1b16;
+  --line: #3f4036;
+  --group-line: #767264;
+  --node-line: #9b9585;
+  --edge: #aaa394;
+  --accent: #c7a15c;
+  --accent-weak: #3a2e19;
+  --focus: #c7a15c;
+  --highlight: #75a7bd;
+  --danger: #d67961;
+  --node: #171813;
+  --group: rgba(34, 34, 28, 0.72);
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+}
+
+[data-theme="forest"] {
+  color-scheme: light;
+  --ink: #20281f;
+  --muted: #687366;
+  --paper: #f1f4ee;
+  --surface: #fdfdf8;
+  --line: #cdd6c8;
+  --group-line: #87917b;
+  --node-line: #596653;
+  --edge: #626d5d;
+  --accent: #5f7138;
+  --accent-weak: #e1ead4;
+  --focus: #5f7138;
+  --highlight: #a06435;
+  --danger: #9e584a;
+  --node: #ffffff;
+  --group: rgba(230, 237, 224, 0.74);
+  --shadow: 0 18px 38px rgba(42, 58, 38, 0.12);
+}
+
+[data-theme="mono"] {
+  color-scheme: light;
+  --ink: #232427;
+  --muted: #6f7175;
+  --paper: #f4f4f2;
+  --surface: #fdfdfb;
+  --line: #d0d0cb;
+  --group-line: #8b8b84;
+  --node-line: #5c605f;
+  --edge: #656a69;
+  --accent: #59606a;
+  --accent-weak: #e2e4e7;
+  --focus: #59606a;
+  --highlight: #8d6b3f;
+  --danger: #9b554c;
+  --node: #ffffff;
+  --group: rgba(236, 236, 232, 0.72);
+  --shadow: 0 18px 38px rgba(28, 29, 31, 0.09);
+}
+
+[data-theme="contrast"] {
+  color-scheme: dark;
+  --ink: #f4f1e8;
+  --muted: #c4bfb2;
+  --paper: #0d0e0c;
+  --surface: #171814;
+  --line: #565244;
+  --group-line: #a49b82;
+  --node-line: #d0c6a8;
+  --edge: #d3cab4;
+  --accent: #e1b96a;
+  --accent-weak: #3f321b;
+  --focus: #e1b96a;
+  --highlight: #6fb5d7;
+  --danger: #f08a70;
+  --node: #141611;
+  --group: rgba(39, 37, 30, 0.78);
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Avenir Next, Hiragino Sans, ui-sans-serif, sans-serif;
+}
+
+.demo-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100vw;
+  height: 100vh;
+}
+
+.demo-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+h1 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.demo-toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  min-width: 72px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+.demo-stage {
+  min-height: 0;
+  padding: 14px;
+}
+
+.sd-dbn-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+}
+
+.sd-dbn-canvas__surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px),
+    var(--surface);
+  background-position: var(--grid-x, 0) var(--grid-y, 0);
+  background-size: var(--grid-size, 24px) var(--grid-size, 24px);
+  box-shadow: var(--shadow);
+  touch-action: none;
+}
+
+.sd-dbn-canvas__graph {
+  position: absolute;
+  inset: 0;
+}
+
+.sd-dbn-canvas__minimap {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 180px;
+  height: 128px;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--ink) 14%, transparent);
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.sd-dbn-canvas__minimap.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.minimap-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.minimap-bg {
+  fill: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.minimap-group {
+  fill: color-mix(in srgb, var(--group-line) 14%, transparent);
+  stroke: color-mix(in srgb, var(--group-line) 58%, transparent);
+  stroke-width: 0.7;
+}
+
+.minimap-edge {
+  fill: none;
+  stroke: color-mix(in srgb, var(--edge) 42%, transparent);
+  stroke-width: 0.8;
+}
+
+.minimap-node {
+  fill: color-mix(in srgb, var(--node-line) 18%, var(--node));
+  stroke: color-mix(in srgb, var(--node-line) 76%, transparent);
+  stroke-width: 0.7;
+}
+
+.minimap-viewport {
+  fill: color-mix(in srgb, var(--accent) 16%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.storybook-canvas-frame {
+  width: 100%;
+  min-height: 360px;
+  padding: 14px;
+  background: var(--paper);
+}
+
+.storybook-api-frame {
+  min-height: 100vh;
+  background: var(--paper);
+}
+
+.storybook-api-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px 0;
+  background: var(--paper);
+}
+
+.graph-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+}
+
+.group-box {
+  fill: var(--group);
+  stroke: var(--group-line);
+  stroke-width: 1.4;
+  transition: fill 120ms ease, filter 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.group-title {
+  fill: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  transition: fill 120ms ease;
+}
+
+.node-box {
+  fill: var(--node);
+  stroke: var(--node-line);
+  stroke-width: 1.2;
+  transition: fill 120ms ease, filter 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.node-title {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  transition: fill 120ms ease;
+}
+
+.node-meta {
+  fill: var(--muted);
+  font-size: 10px;
+  transition: fill 120ms ease;
+}
+
+.node.is-focused .node-box,
+.group.is-focused .group-box {
+  fill: color-mix(in srgb, var(--focus) 8%, var(--node));
+  stroke: var(--focus);
+  stroke-width: 2.2;
+}
+
+.group.is-focused .group-box {
+  fill: color-mix(in srgb, var(--focus) 10%, var(--group));
+}
+
+.node.is-highlighted .node-box,
+.group.is-highlighted .group-box {
+  fill: color-mix(in srgb, var(--highlight) 12%, var(--node));
+  stroke: var(--highlight);
+  stroke-width: 2.4;
+}
+
+.group.is-highlighted .group-box {
+  fill: color-mix(in srgb, var(--highlight) 12%, var(--group));
+}
+
+.node.is-focused.is-highlighted .node-box,
+.group.is-focused.is-highlighted .group-box {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--focus) 58%, transparent));
+  stroke: var(--highlight);
+  stroke-width: 2.8;
+}
+
+.node-title.is-focused,
+.node-meta.is-focused,
+.group-title.is-focused {
+  fill: var(--focus);
+}
+
+.node-title.is-highlighted,
+.node-meta.is-highlighted,
+.group-title.is-highlighted {
+  fill: var(--highlight);
+}
+
+.port {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+
+.edge-path {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.4;
+  transition: stroke 120ms ease, stroke-width 120ms ease, opacity 120ms ease;
+}
+
+.edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  pointer-events: stroke;
+}
+
+.edge-path.rejected {
+  stroke: var(--danger);
+  stroke-dasharray: 7 5;
+}
+
+.edge.is-hovered .edge-path {
+  stroke: var(--accent);
+  stroke-width: 1.9;
+}
+
+.edge-label-bg {
+  fill: var(--surface);
+  fill-opacity: 0.72;
+  stroke: var(--line);
+  stroke-opacity: 0.78;
+  stroke-width: 1;
+  transition: fill-opacity 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.edge-label {
+  fill: var(--ink);
+  font-size: 10px;
+  font-weight: 650;
+  transition: fill 120ms ease;
+}
+
+.edge-label-group {
+  cursor: default;
+}
+
+.edge-label-group.is-hovered .edge-label-bg {
+  fill-opacity: 0.92;
+  stroke: var(--accent);
+  stroke-opacity: 1;
+  stroke-width: 1.6;
+}
+
+.edge-label-group.is-hovered .edge-label {
+  fill: var(--accent);
+}

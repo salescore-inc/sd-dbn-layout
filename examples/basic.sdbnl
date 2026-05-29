@@ -1,0 +1,31 @@
+sddbn "sales-dbn-basic" {
+  view projection
+
+  situation S_newgrad "New graduate intake is growing" {
+    state agreed
+  }
+
+  latent X_training role=state subkind=need "Managers cannot judge enablement progress" {
+    domain absent present
+    desired absent
+    undesired present
+    posterior present=0.90 absent=0.10
+    state agreed
+  }
+
+  latent X_metrics role=means subkind=solution_fit "Action metrics make progress visible" {
+    domain absent present
+    desired present
+    undesired absent
+    posterior present=0.55 absent=0.45
+    state mentioned
+  }
+
+  observation O_quote "Stakeholders report that judgment depends on each manager" {
+    state agreed
+  }
+
+  S_newgrad --> X_training : CONDITIONS
+  X_training -.-> O_quote : MANIFESTS_AS
+  X_metrics -/-> X_training : RESOLVES state=rejected attack=undercut
+}
