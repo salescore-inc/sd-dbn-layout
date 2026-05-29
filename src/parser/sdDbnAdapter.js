@@ -125,16 +125,22 @@ function sortedEvents(events) {
 }
 
 function buildGroups(variables, projection) {
-  return GROUP_DEFINITIONS.map((definition) => {
-    const nodes = variables
-      .filter((variable) => definition.match(variable))
-      .map((variable) => toLayoutNode(variable, projection.get(variable.id)));
+  const groupedVariables = GROUP_DEFINITIONS.map((definition) => ({
+    definition,
+    variables: [],
+  }));
 
+  variables.forEach((variable) => {
+    const group = groupedVariables.find(({ definition }) => definition.match(variable));
+    group.variables.push(variable);
+  });
+
+  return groupedVariables.map(({ definition, variables: groupVariables }) => {
     return {
       id: definition.id,
       label: definition.label,
       direction: "vstack",
-      nodes,
+      nodes: groupVariables.map((variable) => toLayoutNode(variable, projection.get(variable.id))),
     };
   }).filter((group) => group.nodes.length > 0);
 }

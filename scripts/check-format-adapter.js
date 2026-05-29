@@ -13,9 +13,11 @@ for (const document of [formatFixture, ...formatSampleDocuments]) {
   const canvas = sdDbnToCanvas(document);
   const variableIds = new Set(document.schema.variables.map((variable) => variable.id));
   const relationIds = new Set(document.schema.relations.map((relation) => relation.id));
-  const nodeIds = new Set(canvas.groups.flatMap((group) => group.nodes.map((node) => node.id)));
+  const nodes = canvas.groups.flatMap((group) => group.nodes);
+  const nodeIds = new Set(nodes.map((node) => node.id));
   const edgeIds = new Set(canvas.edges.map((edge) => edge.id));
 
+  assert.equal(nodes.length, document.schema.variables.length);
   assert.deepEqual(nodeIds, variableIds);
   assert.deepEqual(edgeIds, relationIds);
   assert.equal(canvas.edges.every((edge) => variableIds.has(edge.from) && variableIds.has(edge.to)), true);
