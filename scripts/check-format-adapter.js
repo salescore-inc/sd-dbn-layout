@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { sdDbnToCanvas } from "../src/parser/sdDbnAdapter.js";
-import { minimalSdDbnDocument } from "../src/examples/minimalSdDbn.js";
+import {
+  formatSampleDocuments,
+  minimalSdDbnDocument,
+} from "../src/examples/formatSamples.js";
 
 const fixturePath = new URL("../../sd-dbn-format/examples/valid/minimal.json", import.meta.url);
 const formatFixture = JSON.parse(await readFile(fixturePath, "utf8"));
 
-for (const document of [formatFixture, minimalSdDbnDocument]) {
+for (const document of [formatFixture, ...formatSampleDocuments]) {
   const canvas = sdDbnToCanvas(document);
   const variableIds = new Set(document.schema.variables.map((variable) => variable.id));
   const relationIds = new Set(document.schema.relations.map((relation) => relation.id));

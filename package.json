@@ -7,7 +7,7 @@
     "dev": "python3 -m http.server 4173",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "check": "node --check src/app.js && node --check src/components/SdDbnCanvas.js && node --check src/examples/sampleGraph.js && node --check src/examples/previewGraphs.js && node --check src/examples/minimalSdDbn.js && node --check src/layout/engine.js && node --check src/parser/sdDbnAdapter.js && node --check src/renderer/svgRenderer.js && node scripts/check-format-adapter.js"
+    "check": "node --check src/app.js && node --check src/components/SdDbnCanvas.js && node --check src/examples/sampleGraph.js && node --check src/examples/previewGraphs.js && node --check src/examples/minimalSdDbn.js && node --check src/examples/formatSamples.js && node --check src/layout/engine.js && node --check src/parser/sdDbnAdapter.js && node --check src/renderer/svgRenderer.js && node scripts/check-format-adapter.js"
   },
   "devDependencies": {
     "@storybook/web-components-vite": "latest",

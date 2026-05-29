@@ -1,6 +1,10 @@
 import { html } from "lit";
 import { sampleCanvas } from "../examples/sampleGraph.js";
-import { minimalSdDbnDocument } from "../examples/minimalSdDbn.js";
+import {
+  minimalSdDbnDocument,
+  objectionSdDbnDocument,
+  onboardingSdDbnDocument,
+} from "../examples/formatSamples.js";
 import {
   adjacentGroupsCanvas,
   compactNodeSizeCanvas,
@@ -114,11 +118,37 @@ export const ProjectionDefault = {
 };
 
 export const FormatJsonProjection = {
-  name: "Format JSON / Projection",
+  name: "Format JSON / Minimal",
   render: renderCanvas,
   args: {
     canvas: sdDbnToCanvas(minimalSdDbnDocument),
     height: 620,
+    theme: "light",
+  },
+  parameters: {
+    controls: { exclude: ["canvas"] },
+  },
+};
+
+export const FormatJsonOnboarding = {
+  name: "Format JSON / Onboarding",
+  render: renderCanvas,
+  args: {
+    canvas: sdDbnToCanvas(onboardingSdDbnDocument),
+    height: 760,
+    theme: "light",
+  },
+  parameters: {
+    controls: { exclude: ["canvas"] },
+  },
+};
+
+export const FormatJsonObjection = {
+  name: "Format JSON / Objection",
+  render: renderCanvas,
+  args: {
+    canvas: sdDbnToCanvas(objectionSdDbnDocument),
+    height: 720,
     theme: "light",
   },
   parameters: {

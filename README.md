@@ -75,7 +75,9 @@ Preview coverage:
 | Story | Focus |
 |---|---|
 | Projection / Default | Baseline SD-DBN projection. |
-| Format JSON / Projection | SD-DBN Format JSON converted with `sdDbnToCanvas()`. |
+| Format JSON / Minimal | Minimal SD-DBN Format JSON converted with `sdDbnToCanvas()`. |
+| Format JSON / Onboarding | Multi-role SD-DBN Format sample with situations, states, means, goal, observations, and argued relations. |
+| Format JSON / Objection | SD-DBN Format sample with obstacle handling and a rejected argued relation. |
 | Nested Groups | Group-Group, Node-Node, and Group-Node edges. |
 | VStack / HStack | Direction override behavior. |
 | Dense Margins | Compact spacing behavior. |
