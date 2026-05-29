@@ -1,43 +1,33 @@
-const GROUP_DEFINITIONS = [
+const ROLE_GROUP_DEFINITIONS = [
   {
-    id: "G_situation",
-    label: "Situation",
-    match: (variable) => variable.kind === "situation",
-  },
-  {
-    id: "G_state",
+    id: "G_role_state",
     label: "State",
-    match: (variable) => variable.kind === "latent" && variable.role === "state",
+    role: "state",
   },
   {
-    id: "G_goal",
-    label: "Goal",
-    match: (variable) => variable.kind === "latent" && variable.role === "goal",
-  },
-  {
-    id: "G_means",
+    id: "G_role_means",
     label: "Means",
-    match: (variable) => variable.kind === "latent" && variable.role === "means",
+    role: "means",
   },
   {
-    id: "G_obstacle",
+    id: "G_role_obstacle",
     label: "Obstacle",
-    match: (variable) => variable.kind === "latent" && variable.role === "obstacle",
+    role: "obstacle",
   },
   {
-    id: "G_factor",
+    id: "G_role_factor",
     label: "Factor",
-    match: (variable) => variable.kind === "latent" && variable.role === "factor",
+    role: "factor",
   },
   {
-    id: "G_observation",
-    label: "Observation",
-    match: (variable) => variable.kind === "observation",
+    id: "G_role_goal",
+    label: "Goal",
+    role: "goal",
   },
   {
-    id: "G_other",
+    id: "G_role_other",
     label: "Other",
-    match: () => true,
+    role: undefined,
   },
 ];
 
@@ -125,24 +115,65 @@ function sortedEvents(events) {
 }
 
 function buildGroups(variables, projection) {
-  const groupedVariables = GROUP_DEFINITIONS.map((definition) => ({
-    definition,
-    variables: [],
-  }));
+  const situations = variables.filter((variable) => variable.kind === "situation");
+  const observations = variables.filter((variable) => variable.kind === "observation");
+  const latents = variables.filter((variable) => variable.kind === "latent");
+  const otherVariables = variables.filter((variable) => !["situation", "latent", "observation"].includes(variable.kind));
+  const groups = [];
 
-  variables.forEach((variable) => {
-    const group = groupedVariables.find(({ definition }) => definition.match(variable));
-    group.variables.push(variable);
-  });
+  if (situations.length > 0) {
+    groups.push(createNodeGroup("G_context", "Context", situations, projection));
+  }
 
-  return groupedVariables.map(({ definition, variables: groupVariables }) => {
-    return {
-      id: definition.id,
-      label: definition.label,
+  if (latents.length > 0) {
+    groups.push({
+      id: "G_argument",
+      label: "Argument",
       direction: "vstack",
-      nodes: groupVariables.map((variable) => toLayoutNode(variable, projection.get(variable.id))),
-    };
+      groups: buildRoleGroups(latents, projection),
+    });
+  }
+
+  if (observations.length > 0) {
+    groups.push(createNodeGroup("G_observation", "Observation", observations, projection));
+  }
+
+  if (otherVariables.length > 0) {
+    groups.push(createNodeGroup("G_other", "Other", otherVariables, projection));
+  }
+
+  return groups;
+}
+
+function buildRoleGroups(latents, projection) {
+  const remaining = new Set(latents);
+  const roleGroups = ROLE_GROUP_DEFINITIONS.map((definition) => {
+    const roleVariables = latents.filter((variable) => {
+      if (definition.role === undefined) {
+        return !variable.role || !ROLE_GROUP_DEFINITIONS.some((roleDefinition) => roleDefinition.role === variable.role);
+      }
+
+      return variable.role === definition.role;
+    });
+
+    roleVariables.forEach((variable) => remaining.delete(variable));
+    return createNodeGroup(definition.id, definition.label, roleVariables, projection);
   }).filter((group) => group.nodes.length > 0);
+
+  if (remaining.size > 0) {
+    roleGroups.push(createNodeGroup("G_role_unclassified", "Unclassified", [...remaining], projection));
+  }
+
+  return roleGroups;
+}
+
+function createNodeGroup(id, label, variables, projection) {
+  return {
+    id,
+    label,
+    direction: "vstack",
+    nodes: variables.map((variable) => toLayoutNode(variable, projection.get(variable.id))),
+  };
 }
 
 function toLayoutNode(variable, projection) {

@@ -13,7 +13,7 @@ for (const document of [formatFixture, ...formatSampleDocuments]) {
   const canvas = sdDbnToCanvas(document);
   const variableIds = new Set(document.schema.variables.map((variable) => variable.id));
   const relationIds = new Set(document.schema.relations.map((relation) => relation.id));
-  const nodes = canvas.groups.flatMap((group) => group.nodes);
+  const nodes = collectNodes(canvas);
   const nodeIds = new Set(nodes.map((node) => node.id));
   const edgeIds = new Set(canvas.edges.map((edge) => edge.id));
 
@@ -24,9 +24,7 @@ for (const document of [formatFixture, ...formatSampleDocuments]) {
 }
 
 const projectionCanvas = sdDbnToCanvas(minimalSdDbnDocument);
-const solutionNode = projectionCanvas.groups
-  .flatMap((group) => group.nodes)
-  .find((node) => node.id === "X_solution");
+const solutionNode = collectNodes(projectionCanvas).find((node) => node.id === "X_solution");
 const arguedEdge = projectionCanvas.edges.find((edge) => edge.id === "r_solution_state");
 
 assert.equal(solutionNode.state, "mentioned");
@@ -34,3 +32,10 @@ assert.deepEqual(solutionNode.posterior, { fit: 0.72, unfit: 0.28 });
 assert.equal(arguedEdge.state, "rejected");
 
 console.log("format adapter check passed");
+
+function collectNodes(container) {
+  return [
+    ...(container.nodes ?? []),
+    ...(container.groups ?? []).flatMap((group) => collectNodes(group)),
+  ];
+}
