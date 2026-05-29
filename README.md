@@ -24,6 +24,25 @@ flowchart LR
 | Layout Engine | role / scheme / kind / evidence_state に基づき、node の列・階層・edge routing を決める。 |
 | Web Component | SVG renderer と pan / zoom / hover / selection を持つ `sd-dbn-canvas` を提供する。 |
 
+## SD-DBN Format Mapping
+
+The component accepts the layout canvas model directly. Use `sdDbnToCanvas()` when the source is an SD-DBN Format document.
+
+```js
+import { defineSdDbnCanvasElement, sdDbnToCanvas } from "@salescore-inc/sd-dbn-layout";
+
+defineSdDbnCanvasElement();
+document.querySelector("sd-dbn-canvas").canvas = sdDbnToCanvas(sdDbnDocument);
+```
+
+| SD-DBN Format | Layout Model |
+|---|---|
+| `schema.variables[]` | `nodes[]`, grouped by `kind` / latent `role` |
+| `schema.relations[]` | `edges[]` with `id`, `from`, `to`, and `scheme` label |
+| latest `believed` / `observed` / `situated` event per `variable` | node projection state, value, and posterior |
+| latest `argued` event per `relation_id` | edge projection state |
+| `kind`, `role`, `subkind`, `domain` | renderer-neutral `sdDbn` metadata |
+
 ## Initial Scope
 
 1. SD-DBN core は変更しない。
@@ -56,6 +75,7 @@ Preview coverage:
 | Story | Focus |
 |---|---|
 | Projection / Default | Baseline SD-DBN projection. |
+| Format JSON / Projection | SD-DBN Format JSON converted with `sdDbnToCanvas()`. |
 | Nested Groups | Group-Group, Node-Node, and Group-Node edges. |
 | VStack / HStack | Direction override behavior. |
 | Dense Margins | Compact spacing behavior. |

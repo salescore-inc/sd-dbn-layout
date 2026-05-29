@@ -13,6 +13,7 @@
   --accent-weak: #d8e9e7;
   --focus: #2f6f73;
   --highlight: #a15f2a;
+  --success: #4d7d4b;
   --danger: #a95348;
   --node: #ffffff;
   --group: rgba(238, 235, 226, 0.72);
@@ -34,6 +35,7 @@
     --accent-weak: #3a2e19;
     --focus: #c7a15c;
     --highlight: #75a7bd;
+    --success: #8ea46d;
     --danger: #d67961;
     --node: #171813;
     --group: rgba(34, 34, 28, 0.72);
@@ -55,6 +57,7 @@
   --accent-weak: #3a2e19;
   --focus: #c7a15c;
   --highlight: #75a7bd;
+  --success: #8ea46d;
   --danger: #d67961;
   --node: #171813;
   --group: rgba(34, 34, 28, 0.72);
@@ -75,6 +78,7 @@
   --accent-weak: #e1ead4;
   --focus: #5f7138;
   --highlight: #a06435;
+  --success: #4f7e46;
   --danger: #9e584a;
   --node: #ffffff;
   --group: rgba(230, 237, 224, 0.74);
@@ -95,6 +99,7 @@
   --accent-weak: #e2e4e7;
   --focus: #59606a;
   --highlight: #8d6b3f;
+  --success: #5f7356;
   --danger: #9b554c;
   --node: #ffffff;
   --group: rgba(236, 236, 232, 0.72);
@@ -115,6 +120,7 @@
   --accent-weak: #3f321b;
   --focus: #e1b96a;
   --highlight: #6fb5d7;
+  --success: #9fce7b;
   --danger: #f08a70;
   --node: #141611;
   --group: rgba(39, 37, 30, 0.78);
@@ -325,6 +331,18 @@ button:hover {
   transition: fill 120ms ease, filter 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
 }
 
+.node.state-agreed .node-box {
+  stroke: var(--success);
+}
+
+.node.state-mentioned .node-box {
+  stroke: var(--accent);
+}
+
+.node.state-rejected .node-box {
+  stroke: var(--danger);
+}
+
 .node-title {
   fill: var(--ink);
   font-size: 12px;
@@ -399,7 +417,7 @@ button:hover {
   pointer-events: stroke;
 }
 
-.edge-path.rejected {
+.edge.state-rejected .edge-path {
   stroke: var(--danger);
   stroke-dasharray: 7 5;
 }

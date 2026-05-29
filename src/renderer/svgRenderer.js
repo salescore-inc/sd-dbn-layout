@@ -92,7 +92,10 @@ function drawGroup(layer, labelLayer, group) {
 }
 
 function drawNode(layer, portLayer, labelLayer, node) {
-  const item = createElement("g", { class: "node", "data-id": node.id });
+  const item = createElement("g", {
+    class: ["node", stateClass(node.state)].filter(Boolean).join(" "),
+    "data-id": node.id,
+  });
 
   item.appendChild(createElement("rect", {
     class: "node-box",
@@ -137,7 +140,10 @@ function drawEdge(layer, labelLayer, edge) {
   const pathData = edge.points
     .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
     .join(" ");
-  const item = createElement("g", { class: "edge", "data-id": edge.id });
+  const item = createElement("g", {
+    class: ["edge", stateClass(edge.state)].filter(Boolean).join(" "),
+    "data-id": edge.id,
+  });
 
   item.appendChild(createElement("path", {
     class: "edge-hit",
@@ -145,7 +151,7 @@ function drawEdge(layer, labelLayer, edge) {
   }));
 
   item.appendChild(createElement("path", {
-    class: `edge-path ${edge.state ?? ""}`,
+    class: "edge-path",
     d: pathData,
     "marker-end": "url(#arrow)",
   }));
@@ -172,6 +178,10 @@ function drawEdge(layer, labelLayer, edge) {
 
   layer.appendChild(item);
   labelLayer.appendChild(labelItem);
+}
+
+function stateClass(state) {
+  return state ? `state-${state}` : "";
 }
 
 function bindEdgeHover(svg) {

@@ -1,5 +1,6 @@
 import { html } from "lit";
 import { sampleCanvas } from "../examples/sampleGraph.js";
+import { minimalSdDbnDocument } from "../examples/minimalSdDbn.js";
 import {
   adjacentGroupsCanvas,
   compactNodeSizeCanvas,
@@ -11,6 +12,7 @@ import {
   nestedGroupCanvas,
   verticalStackCanvas,
 } from "../examples/previewGraphs.js";
+import { sdDbnToCanvas } from "../parser/sdDbnAdapter.js";
 
 const meta = {
   title: "SD-DBN/SdDbnCanvas",
@@ -103,6 +105,19 @@ export const ProjectionDefault = {
   render: renderCanvas,
   args: {
     canvas: sampleCanvas,
+    height: 620,
+    theme: "light",
+  },
+  parameters: {
+    controls: { exclude: ["canvas"] },
+  },
+};
+
+export const FormatJsonProjection = {
+  name: "Format JSON / Projection",
+  render: renderCanvas,
+  args: {
+    canvas: sdDbnToCanvas(minimalSdDbnDocument),
     height: 620,
     theme: "light",
   },

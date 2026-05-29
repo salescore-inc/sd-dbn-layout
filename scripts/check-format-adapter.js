@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { sdDbnToCanvas } from "../src/parser/sdDbnAdapter.js";
+import { minimalSdDbnDocument } from "../src/examples/minimalSdDbn.js";
+
+const fixturePath = new URL("../../sd-dbn-format/examples/valid/minimal.json", import.meta.url);
+const formatFixture = JSON.parse(await readFile(fixturePath, "utf8"));
+
+for (const document of [formatFixture, minimalSdDbnDocument]) {
+  const canvas = sdDbnToCanvas(document);
+  const variableIds = new Set(document.schema.variables.map((variable) => variable.id));
+  const relationIds = new Set(document.schema.relations.map((relation) => relation.id));
+  const nodeIds = new Set(canvas.groups.flatMap((group) => group.nodes.map((node) => node.id)));
+  const edgeIds = new Set(canvas.edges.map((edge) => edge.id));
+
+  assert.deepEqual(nodeIds, variableIds);
+  assert.deepEqual(edgeIds, relationIds);
+  assert.equal(canvas.edges.every((edge) => variableIds.has(edge.from) && variableIds.has(edge.to)), true);
+}
+
+const projectionCanvas = sdDbnToCanvas(minimalSdDbnDocument);
+const solutionNode = projectionCanvas.groups
+  .flatMap((group) => group.nodes)
+  .find((node) => node.id === "X_solution");
+const arguedEdge = projectionCanvas.edges.find((edge) => edge.id === "r_solution_state");
+
+assert.equal(solutionNode.state, "mentioned");
+assert.deepEqual(solutionNode.posterior, { fit: 0.72, unfit: 0.28 });
+assert.equal(arguedEdge.state, "rejected");
+
+console.log("format adapter check passed");
