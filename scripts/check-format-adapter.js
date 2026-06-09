@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { layoutCanvas } from "../src/layout/engine.js";
 import { sdDbnToCanvas } from "../src/parser/sdDbnAdapter.js";
 import {
   formatSampleDocuments,
@@ -30,6 +31,12 @@ const arguedEdge = projectionCanvas.edges.find((edge) => edge.id === "r_solution
 assert.equal(solutionNode.state, "mentioned");
 assert.deepEqual(solutionNode.posterior, { fit: 0.72, unfit: 0.28 });
 assert.equal(arguedEdge.state, "rejected");
+
+const projectionLayout = layoutCanvas(projectionCanvas);
+const layoutSolutionNode = projectionLayout.nodes.find((node) => node.id === "X_solution");
+
+assert.equal(layoutSolutionNode.state, "mentioned");
+assert.deepEqual(layoutSolutionNode.posterior, { fit: 0.72, unfit: 0.28 });
 
 console.log("format adapter check passed");
 

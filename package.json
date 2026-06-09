@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
   "scripts": {
     "dev": "python3 -m http.server 4173",
     "storybook": "storybook dev -p 6006",
@@ -11,10 +19,8 @@
   },
   "devDependencies": {
     "@storybook/web-components-vite": "latest",
+    "lit": "latest",
     "storybook": "latest",
     "vite": "latest"
-  },
-  "dependencies": {
-    "lit": "latest"
   }
 }
