@@ -1,7 +1,18 @@
 const SVG_NS = "http://www.w3.org/2000/svg";
 const GRID_SIZE = 24;
+const NODE_TEXT_PADDING_X = 14;
+const NODE_TITLE_TOP = 23;
+const NODE_TITLE_LINE_HEIGHT = 15;
+const NODE_TITLE_META_GAP = 15;
+const NODE_TITLE_BOTTOM_PADDING = 12;
+const NODE_META_BOTTOM = 14;
+const NODE_LABEL_CLIP_PADDING_Y = 8;
+const ELLIPSIS = "...";
+
+let rendererInstanceCount = 0;
 
 export function createSvgRenderer(root, layout) {
+  const rendererId = `sd-dbn-renderer-${rendererInstanceCount += 1}`;
   const svg = createElement("svg", {
     class: "graph-svg",
     role: "img",
@@ -39,7 +50,7 @@ export function createSvgRenderer(root, layout) {
     draw(transform) {
       viewport.setAttribute("transform", toTransform(transform));
       setGridTransform(root, transform);
-      drawGraph(viewport, layout);
+      drawGraph(viewport, layout, rendererId);
       applyVisualState(svg, visualState);
     },
     setVisualState(nextState = {}) {
@@ -50,22 +61,23 @@ export function createSvgRenderer(root, layout) {
   };
 }
 
-function drawGraph(viewport, layout) {
+function drawGraph(viewport, layout, rendererId) {
   viewport.replaceChildren();
 
+  const defs = createElement("defs", { class: "graph-defs" });
   const groupLayer = createElement("g", { class: "group-layer" });
   const nodeLayer = createElement("g", { class: "node-layer" });
   const portLayer = createElement("g", { class: "port-layer" });
   const edgeLayer = createElement("g", { class: "edge-layer" });
   const labelLayer = createElement("g", { class: "label-layer" });
 
-  viewport.append(groupLayer, nodeLayer, portLayer, edgeLayer, labelLayer);
+  viewport.append(defs, groupLayer, nodeLayer, portLayer, edgeLayer, labelLayer);
 
   layout.groups
     .sort((a, b) => b.width * b.height - a.width * a.height)
     .forEach((group) => drawGroup(groupLayer, labelLayer, group));
 
-  layout.nodes.forEach((node) => drawNode(nodeLayer, portLayer, labelLayer, node));
+  layout.nodes.forEach((node) => drawNode(nodeLayer, portLayer, labelLayer, defs, node, rendererId));
   layout.edges.forEach((edge) => drawEdge(edgeLayer, labelLayer, edge));
 }
 
@@ -91,11 +103,13 @@ function drawGroup(layer, labelLayer, group) {
   layer.appendChild(item);
 }
 
-function drawNode(layer, portLayer, labelLayer, node) {
+function drawNode(layer, portLayer, labelLayer, defs, node, rendererId) {
   const item = createElement("g", {
     class: ["node", stateClass(node.state)].filter(Boolean).join(" "),
     "data-id": node.id,
   });
+  const clipPathId = createNodeLabelClipPath(defs, node, rendererId);
+  const clipPath = `url(#${clipPathId})`;
 
   item.appendChild(createElement("rect", {
     class: "node-box",
@@ -106,14 +120,19 @@ function drawNode(layer, portLayer, labelLayer, node) {
     rx: 6,
   }));
 
+  item.appendChild(createTitle(node.label));
+
   layer.appendChild(item);
 
-  wrapLabel(node.label, 22).forEach((line, index) => {
+  const textWidth = Math.max(1, node.width - NODE_TEXT_PADDING_X * 2);
+  const maxLines = getNodeTitleLineLimit(node);
+  wrapLabel(node.label, textWidth, { maxLines }).forEach((line, index) => {
     labelLayer.appendChild(createText(line, {
       class: "node-title",
       "data-id": node.id,
-      x: node.x + 14,
-      y: node.y + 23 + index * 15,
+      x: node.x + NODE_TEXT_PADDING_X,
+      y: node.y + NODE_TITLE_TOP + index * NODE_TITLE_LINE_HEIGHT,
+      "clip-path": clipPath,
     }));
   });
 
@@ -121,8 +140,9 @@ function drawNode(layer, portLayer, labelLayer, node) {
     labelLayer.appendChild(createText(node.meta, {
       class: "node-meta",
       "data-id": node.id,
-      x: node.x + 14,
-      y: node.y + node.height - 14,
+      x: node.x + NODE_TEXT_PADDING_X,
+      y: node.y + node.height - NODE_META_BOTTOM,
+      "clip-path": clipPath,
     }));
   }
 
@@ -134,6 +154,30 @@ function drawNode(layer, portLayer, labelLayer, node) {
       r: 4,
     }));
   });
+}
+
+function createNodeLabelClipPath(defs, node, rendererId) {
+  const clipPathId = `${rendererId}-node-label-${toSafeSvgIdPart(node.id)}`;
+  const clipPath = createElement("clipPath", {
+    id: clipPathId,
+    clipPathUnits: "userSpaceOnUse",
+  });
+  clipPath.appendChild(createElement("rect", {
+    x: node.x + NODE_TEXT_PADDING_X,
+    y: node.y + NODE_LABEL_CLIP_PADDING_Y,
+    width: Math.max(1, node.width - NODE_TEXT_PADDING_X * 2),
+    height: Math.max(1, node.height - NODE_LABEL_CLIP_PADDING_Y * 2),
+  }));
+  defs.appendChild(clipPath);
+  return clipPathId;
+}
+
+function getNodeTitleLineLimit(node) {
+  const reservedBottom = node.meta
+    ? NODE_META_BOTTOM + NODE_TITLE_META_GAP
+    : NODE_TITLE_BOTTOM_PADDING;
+  const lastBaseline = node.height - reservedBottom;
+  return Math.max(1, Math.floor((lastBaseline - NODE_TITLE_TOP) / NODE_TITLE_LINE_HEIGHT) + 1);
 }
 
 function drawEdge(layer, labelLayer, edge) {
@@ -266,28 +310,196 @@ function createText(value, attributes = {}) {
   return text;
 }
 
+function createTitle(value) {
+  const title = createElement("title");
+  title.textContent = value;
+  return title;
+}
+
 function toTransform(transform) {
   return `translate(${transform.x} ${transform.y}) scale(${transform.scale})`;
 }
 
-function wrapLabel(label, maxLength) {
-  const words = label.split(/\s+/);
+export function wrapLabel(label, maxWidth, options = {}) {
+  const normalizedLabel = String(label ?? "").replace(/\s+/g, " ").trim();
+  const lineLimit = options.maxLines ?? Number.POSITIVE_INFINITY;
+  const maxLines = Number.isFinite(lineLimit)
+    ? Math.max(1, Math.floor(lineLimit))
+    : Number.POSITIVE_INFINITY;
+
+  if (!normalizedLabel) {
+    return [];
+  }
+
+  const lines = wrapTokens(segmentLabel(normalizedLabel), Math.max(1, maxWidth));
+  return limitLines(lines, Math.max(1, maxWidth), maxLines);
+}
+
+function wrapTokens(tokens, maxWidth) {
   const lines = [];
   let line = "";
 
-  words.forEach((word) => {
-    const next = line ? `${line} ${word}` : word;
-    if (next.length > maxLength && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = next;
+  tokens.forEach((token) => {
+    if (token === " " && !line) {
+      return;
     }
+
+    const next = line ? `${line}${token}` : token.trimStart();
+
+    if (measureTextWidth(next) <= maxWidth) {
+      line = next;
+      return;
+    }
+
+    if (line) {
+      lines.push(line.trimEnd());
+      line = "";
+    }
+
+    splitTokenToWidth(token.trimStart(), maxWidth).forEach((part) => {
+      if (measureTextWidth(part) > maxWidth && !line) {
+        lines.push(part);
+        return;
+      }
+
+      if (!line) {
+        line = part;
+        return;
+      }
+
+      const splitNext = `${line}${part}`;
+      if (measureTextWidth(splitNext) <= maxWidth) {
+        line = splitNext;
+      } else {
+        lines.push(line.trimEnd());
+        line = part;
+      }
+    });
   });
 
   if (line) {
-    lines.push(line);
+    lines.push(line.trimEnd());
   }
 
   return lines;
+}
+
+function segmentLabel(label) {
+  const tokens = [];
+  let run = "";
+
+  Array.from(label).forEach((character) => {
+    if (character === " ") {
+      flushRun(tokens, run);
+      run = "";
+      tokens.push(character);
+      return;
+    }
+
+    if (isFullWidthCharacter(character)) {
+      flushRun(tokens, run);
+      run = "";
+      tokens.push(character);
+      return;
+    }
+
+    run += character;
+  });
+
+  flushRun(tokens, run);
+  return tokens;
+}
+
+function flushRun(tokens, run) {
+  if (run) {
+    tokens.push(run);
+  }
+}
+
+function splitTokenToWidth(token, maxWidth) {
+  if (!token || measureTextWidth(token) <= maxWidth) {
+    return token ? [token] : [];
+  }
+
+  const parts = [];
+  let part = "";
+
+  Array.from(token).forEach((character) => {
+    const next = `${part}${character}`;
+    if (part && measureTextWidth(next) > maxWidth) {
+      parts.push(part);
+      part = character;
+    } else {
+      part = next;
+    }
+  });
+
+  if (part) {
+    parts.push(part);
+  }
+
+  return parts;
+}
+
+function limitLines(lines, maxWidth, maxLines) {
+  if (!Number.isFinite(maxLines) || lines.length <= maxLines) {
+    return lines;
+  }
+
+  const visibleLines = lines.slice(0, maxLines);
+  const lastIndex = visibleLines.length - 1;
+  visibleLines[lastIndex] = fitTextToWidth(`${visibleLines[lastIndex]}${ELLIPSIS}`, maxWidth);
+  return visibleLines;
+}
+
+function fitTextToWidth(text, maxWidth) {
+  if (measureTextWidth(text) <= maxWidth) {
+    return text;
+  }
+
+  let fitted = "";
+  Array.from(text.replace(new RegExp(`${escapeRegExp(ELLIPSIS)}$`), "")).forEach((character) => {
+    const next = `${fitted}${character}${ELLIPSIS}`;
+    if (measureTextWidth(next) <= maxWidth) {
+      fitted += character;
+    }
+  });
+
+  return fitted ? `${fitted}${ELLIPSIS}` : ELLIPSIS;
+}
+
+function measureTextWidth(text) {
+  return Array.from(text).reduce((width, character) => width + getCharacterWidth(character), 0);
+}
+
+function getCharacterWidth(character) {
+  if (character === " ") {
+    return 3.5;
+  }
+
+  if (isFullWidthCharacter(character)) {
+    return 12;
+  }
+
+  if (/[A-Z0-9]/.test(character)) {
+    return 7.2;
+  }
+
+  if (/[a-z]/.test(character)) {
+    return 6.2;
+  }
+
+  return 5.8;
+}
+
+function isFullWidthCharacter(character) {
+  return /[\u1100-\u115f\u2329\u232a\u2e80-\u303e\u3040-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe10-\ufe19\ufe30-\ufe6f\uff00-\uff60\uffe0-\uffe6]/.test(character);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function toSafeSvgIdPart(value) {
+  return String(value ?? "item").replace(/[^a-zA-Z0-9_-]/g, "_");
 }
