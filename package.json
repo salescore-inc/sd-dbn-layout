@@ -1,8 +1,19 @@
 {
   "name": "@salescore-inc/sd-dbn-layout",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "license": "UNLICENSED",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salescore-inc/sd-dbn-layout.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
   "exports": {
